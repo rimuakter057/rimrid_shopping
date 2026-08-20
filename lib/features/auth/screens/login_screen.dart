@@ -12,7 +12,9 @@ import '../../../core/widgets/fields/custom_text_field.dart';
 import '../providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final String? prefillUsername;
+
+  const LoginScreen({super.key, this.prefillUsername});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -20,9 +22,17 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController(text: 'alex.rimrid@example.com');
-  final _passwordController = TextEditingController(text: 'password123');
+  late final TextEditingController _emailController;
+  late final TextEditingController _passwordController;
   bool _obscurePassword = true;
+
+  @override
+  void initState() {
+    super.initState();
+    final justSignedUp = widget.prefillUsername != null;
+    _emailController = TextEditingController(text: widget.prefillUsername ?? 'emilys');
+    _passwordController = TextEditingController(text: justSignedUp ? '' : 'emilyspass');
+  }
 
   @override
   void dispose() {
@@ -39,9 +49,16 @@ class _LoginScreenState extends State<LoginScreen> {
         _passwordController.text,
       );
 
-      if (mounted && success) {
+      if (!mounted) return;
+      if (success) {
         AppHelpers.showSnackBar(context, 'Welcome back, ${authProvider.currentUser?.name}!', isSuccess: true);
         context.go('/home');
+      } else {
+        AppHelpers.showSnackBar(
+          context,
+          authProvider.errorMessage ?? 'Login failed. Please try again.',
+          isError: true,
+        );
       }
     }
   }
@@ -91,14 +108,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     AppSpacing.verticalXl,
 
-                    // Email Field
+                    // Username Field
                     CustomTextField(
-                      label: 'Email Address',
-                      hint: 'name@example.com',
+                      label: 'Username',
+                      hint: 'e.g. emilys',
                       controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      validator: Validators.validateEmail,
-                      prefixIcon: const Icon(Icons.email_outlined, color: AppColors.textSecondary),
+                      keyboardType: TextInputType.text,
+                      validator: (val) => Validators.validateRequired(val, 'Username'),
+                      prefixIcon: const Icon(Icons.person_outline_rounded, color: AppColors.textSecondary),
                     ),
                     AppSpacing.verticalLg,
 
@@ -117,6 +134,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                       ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Demo login: emilys / emilyspass (DummyJSON test user)',
+                      style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
                     ),
 
                     // Forgot Password link
@@ -154,7 +176,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Center(
                       child: TextButton(
                         onPressed: () {
-                          authProvider.login('guest@rimrid.com', 'password123');
+                          authProvider.loginAsGuest();
                           context.go('/home');
                         },
                         child: Text(

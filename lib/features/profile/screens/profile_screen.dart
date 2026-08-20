@@ -8,6 +8,7 @@ import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_shadows.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/utils/avatar_helper.dart';
 import '../../../core/utils/helpers.dart';
 import '../../../core/widgets/common/custom_app_bar.dart';
 import '../../../core/widgets/common/custom_dialog.dart';
@@ -49,8 +50,8 @@ class ProfileScreen extends StatelessWidget {
                     CircleAvatar(
                       radius: 36,
                       backgroundColor: AppColors.primaryLight,
-                      backgroundImage: user?.avatarUrl != null ? NetworkImage(user!.avatarUrl!) : null,
-                      child: user?.avatarUrl == null
+                      backgroundImage: AvatarHelper.resolve(user?.avatarUrl),
+                      child: AvatarHelper.resolve(user?.avatarUrl) == null
                           ? const Icon(Icons.person_rounded, size: 36, color: AppColors.primary)
                           : null,
                     ),
@@ -75,6 +76,10 @@ class ProfileScreen extends StatelessWidget {
                           ),
                         ],
                       ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.edit_outlined, color: AppColors.primary),
+                      onPressed: () => context.push('/profile/edit'),
                     ),
                   ],
                 ),

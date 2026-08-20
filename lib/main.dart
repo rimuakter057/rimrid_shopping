@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'core/constants/app_constants.dart';
 import 'core/routes/app_router.dart';
+import 'core/services/local_storage_service.dart';
 import 'core/theme/app_theme.dart';
 
 import 'features/auth/providers/auth_provider.dart';
@@ -12,8 +13,9 @@ import 'features/orders/providers/order_provider.dart';
 import 'features/profile/providers/profile_provider.dart';
 import 'features/settings/providers/settings_provider.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await LocalStorageService.init();
   runApp(const RimRidShoppingApp());
 }
 

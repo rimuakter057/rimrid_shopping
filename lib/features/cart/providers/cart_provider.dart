@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/cart_item_model.dart';
 import '../../products/models/product_model.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/services/local_storage_service.dart';
 
 class CartProvider extends ChangeNotifier {
   final List<CartItemModel> _items = [];
@@ -26,6 +27,22 @@ class CartProvider extends ChangeNotifier {
   double get tax => subtotal * AppConstants.defaultTaxRate;
 
   double get total => (subtotal + tax + shippingFee - _discountAmount).clamp(0.0, double.infinity);
+
+  CartProvider() {
+    debugPrint('[CART PROVIDER] 📂 Restoring persisted cart...');
+    final storedItems = LocalStorageService.cartBox.get('items') as List?;
+    if (storedItems != null) {
+      _items.addAll(storedItems.map((e) => CartItemModel.fromJson(e as Map)));
+    }
+    _appliedPromoCode = LocalStorageService.cartBox.get('promoCode', defaultValue: '') as String;
+    _discountAmount = (LocalStorageService.cartBox.get('discount', defaultValue: 0.0) as num).toDouble();
+  }
+
+  void _persist() {
+    LocalStorageService.cartBox.put('items', _items.map((e) => e.toJson()).toList());
+    LocalStorageService.cartBox.put('promoCode', _appliedPromoCode);
+    LocalStorageService.cartBox.put('discount', _discountAmount);
+  }
 
   void addToCart(ProductModel product, {int quantity = 1, String? size, String? color}) {
     debugPrint('[CART PROVIDER] 🛒 Adding to cart: "${product.title}" x $quantity (Size: $size, Color: $color)');
@@ -52,6 +69,7 @@ class CartProvider extends ChangeNotifier {
       debugPrint('[CART PROVIDER] ➕ Added new item to cart. Total items in cart: ${_items.length}');
     }
     debugPrint('[CART PROVIDER] 💰 Updated Subtotal: \$$subtotal | Total: \$$total');
+    _persist();
     notifyListeners();
   }
 
@@ -64,6 +82,7 @@ class CartProvider extends ChangeNotifier {
     final index = _items.indexOf(item);
     if (index >= 0) {
       _items[index] = item.copyWith(quantity: newQuantity);
+      _persist();
       notifyListeners();
     }
   }
@@ -75,6 +94,7 @@ class CartProvider extends ChangeNotifier {
       _appliedPromoCode = '';
       _discountAmount = 0.0;
     }
+    _persist();
     notifyListeners();
   }
 
@@ -84,6 +104,7 @@ class CartProvider extends ChangeNotifier {
       _appliedPromoCode = 'RIMRID15';
       _discountAmount = AppConstants.defaultPromoDiscount;
       debugPrint('[CART PROVIDER] ✅ Promo Code "RIMRID15" applied! Discount: -\$$_discountAmount');
+      _persist();
       notifyListeners();
       return true;
     }
@@ -95,6 +116,7 @@ class CartProvider extends ChangeNotifier {
     debugPrint('[CART PROVIDER] 🗑️ Removed promo code');
     _appliedPromoCode = '';
     _discountAmount = 0.0;
+    _persist();
     notifyListeners();
   }
 
@@ -103,6 +125,7 @@ class CartProvider extends ChangeNotifier {
     _items.clear();
     _appliedPromoCode = '';
     _discountAmount = 0.0;
+    _persist();
     notifyListeners();
   }
 }

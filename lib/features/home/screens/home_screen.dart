@@ -7,6 +7,7 @@ import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/utils/avatar_helper.dart';
 import '../../../core/utils/helpers.dart';
 import '../../../core/widgets/cards/category_card.dart';
 import '../../../core/widgets/cards/product_card.dart';
@@ -95,8 +96,8 @@ class HomeScreen extends StatelessWidget {
                   CircleAvatar(
                     radius: 22,
                     backgroundColor: AppColors.primaryLight,
-                    backgroundImage: user?.avatarUrl != null ? NetworkImage(user!.avatarUrl!) : null,
-                    child: user?.avatarUrl == null
+                    backgroundImage: AvatarHelper.resolve(user?.avatarUrl),
+                    child: AvatarHelper.resolve(user?.avatarUrl) == null
                         ? const Icon(Icons.person_outline_rounded, color: AppColors.primary)
                         : null,
                   ),

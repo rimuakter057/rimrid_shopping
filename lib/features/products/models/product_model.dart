@@ -36,9 +36,51 @@ class ProductModel {
   });
 
   bool get hasDiscount => originalPrice != null && originalPrice! > price;
-  
+
   double get discountPercentage {
     if (!hasDiscount) return 0;
     return (((originalPrice! - price) / originalPrice!) * 100);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'brand': brand,
+      'category': category,
+      'price': price,
+      'originalPrice': originalPrice,
+      'rating': rating,
+      'reviewCount': reviewCount,
+      'images': images,
+      'description': description,
+      'isFeatured': isFeatured,
+      'isTrending': isTrending,
+      'isFlashSale': isFlashSale,
+      'sizes': sizes,
+      'colors': colors,
+      'stockCount': stockCount,
+    };
+  }
+
+  factory ProductModel.fromJson(Map<dynamic, dynamic> json) {
+    return ProductModel(
+      id: json['id'].toString(),
+      title: json['title'] ?? '',
+      brand: json['brand'] ?? '',
+      category: json['category'] ?? '',
+      price: (json['price'] as num?)?.toDouble() ?? 0.0,
+      originalPrice: (json['originalPrice'] as num?)?.toDouble(),
+      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
+      reviewCount: (json['reviewCount'] as num?)?.toInt() ?? 0,
+      images: (json['images'] as List? ?? []).map((e) => e.toString()).toList(),
+      description: json['description'] ?? '',
+      isFeatured: json['isFeatured'] ?? false,
+      isTrending: json['isTrending'] ?? false,
+      isFlashSale: json['isFlashSale'] ?? false,
+      sizes: (json['sizes'] as List? ?? []).map((e) => e.toString()).toList(),
+      colors: (json['colors'] as List? ?? []).map((e) => e.toString()).toList(),
+      stockCount: (json['stockCount'] as num?)?.toInt() ?? 10,
+    );
   }
 }

@@ -44,9 +44,17 @@ class _SignupScreenState extends State<SignupScreen> {
         _passwordController.text,
       );
 
-      if (mounted && success) {
-        AppHelpers.showSnackBar(context, 'Account created successfully!', isSuccess: true);
-        context.go('/home');
+      if (!mounted) return;
+      if (success) {
+        final username = _emailController.text.trim().split('@').first;
+        AppHelpers.showSnackBar(context, 'Account created! Please sign in.', isSuccess: true);
+        context.go('/login', extra: username);
+      } else {
+        AppHelpers.showSnackBar(
+          context,
+          authProvider.errorMessage ?? 'Signup failed. Please try again.',
+          isError: true,
+        );
       }
     }
   }

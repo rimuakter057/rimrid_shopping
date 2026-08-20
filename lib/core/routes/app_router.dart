@@ -23,6 +23,7 @@ import '../../features/checkout/screens/order_success_screen.dart';
 import '../../features/orders/screens/order_details_screen.dart';
 import '../../features/wishlist/screens/wishlist_screen.dart';
 import '../../features/settings/screens/settings_screen.dart';
+import '../../features/profile/screens/edit_profile_screen.dart';
 
 import '../../features/cart/providers/cart_provider.dart';
 
@@ -51,7 +52,7 @@ class AppRouter {
       // Auth Routes
       GoRoute(
         path: '/login',
-        builder: (context, state) => const LoginScreen(),
+        builder: (context, state) => LoginScreen(prefillUsername: state.extra as String?),
       ),
       GoRoute(
         path: '/signup',
@@ -176,6 +177,11 @@ class AppRouter {
         path: '/settings',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: '/profile/edit',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const EditProfileScreen(),
       ),
     ],
   );

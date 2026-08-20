@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/order_model.dart';
 import '../../cart/models/cart_item_model.dart';
 import '../../products/models/product_model.dart';
+import '../../../core/services/local_storage_service.dart';
 
 class OrderProvider extends ChangeNotifier {
   final List<OrderModel> _orders = [];
@@ -10,8 +11,14 @@ class OrderProvider extends ChangeNotifier {
   List<OrderModel> get orders => List.unmodifiable(_orders);
 
   OrderProvider() {
-    debugPrint('[ORDER PROVIDER] 📦 Initializing OrderProvider...');
-    // Initial mock order for demo
+    debugPrint('[ORDER PROVIDER] 📦 Restoring persisted orders...');
+    final storedOrders = LocalStorageService.ordersBox.get('orders') as List?;
+    if (storedOrders != null && storedOrders.isNotEmpty) {
+      _orders.addAll(storedOrders.map((e) => OrderModel.fromJson(e as Map)));
+      return;
+    }
+
+    // First run: seed with a sample order so the Orders screen isn't empty.
     _orders.add(
       OrderModel(
         id: 'ORD-8921-X',
@@ -43,6 +50,11 @@ class OrderProvider extends ChangeNotifier {
         paymentMethod: 'Credit Card (•••• 4242)',
       ),
     );
+    _persist();
+  }
+
+  void _persist() {
+    LocalStorageService.ordersBox.put('orders', _orders.map((e) => e.toJson()).toList());
   }
 
   List<OrderModel> getFilteredOrders(OrderStatus? statusFilter) {
@@ -88,6 +100,7 @@ class OrderProvider extends ChangeNotifier {
     );
 
     _orders.insert(0, newOrder);
+    _persist();
     debugPrint('[ORDER PROVIDER] 🎉 Order $orderId created successfully! Active order count: ${_orders.length}');
     notifyListeners();
     return newOrder;
