@@ -1,6 +1,6 @@
 # RimRid Shopping
 
-A complete, portfolio-ready e-commerce shopping app built with **Flutter**. Real product data from a live free API, real network authentication, and full on-device persistence — cart, wishlist, orders, and your session all survive an app restart.
+An e-commerce shopping app built with **Flutter**, with real product data from a live free API, real network authentication, and full on-device persistence for cart, wishlist, orders, and login sessions.
 
 ## Screenshots
 
